@@ -44,18 +44,44 @@ awslocal cloudformation create-stack --stack-name 'test-stack' --template-body f
 ```
 
 This will create a CF stack on localstack and give you information about the creation.
-
 ```
-localstack_demo      | 2021-03-05T18:29:07:DEBUG:localstack.services.cloudformation.cloudformation_api: Creating stack "test-stack" with 6 resources ...
+----------------------------------------------------------------------------------------
+|                                      CreateStack                                     |
++---------+----------------------------------------------------------------------------+
+|  StackId|  arn:aws:cloudformation:us-east-1:000000000000:stack/test-stack/6f37f385   |
++---------+----------------------------------------------------------------------------+
+```
+Your output may differ and be presented as JSON or YAML depending on your default output settings.
 
-# .... snip
-
-localstack_demo      | 2021-03-05T18:59:07:DEBUG:localstack.utils.cloudformation.template_deployer: Request for resource type "ApiGateway::Stage" in region us-east-1: create_stage {'deploymentId': '6x7783s40k', 'description': 'Mock API Stage v0', 'restApiId': 'oxosx0ft3n', 'stageName': 'v0'}
+4. Get the RestApiId from the stack output.
+```sh
+awslocal cloudformation describe-stacks --stack-name test-stack --output table
+```
+Which will output:
+```
+-----------------------------------------------------------------------------------------------
+|                                       DescribeStacks                                        |
++---------------------------------------------------------------------------------------------+
+||                                          Stacks                                           ||
+|+--------------+----------------------------------------------------------------------------+|
+||  CreationTime|  2021-03-05T19:57:49.474000+00:00                                          ||
+||  StackId     |  arn:aws:cloudformation:us-east-1:000000000000:stack/test-stack/6f37f385   ||
+||  StackName   |  test-stack                                                                ||
+||  StackStatus |  CREATE_COMPLETE                                                           ||
+|+--------------+----------------------------------------------------------------------------+|
+|||                                         Outputs                                         |||
+||+------------------------------------+----------------------------------------------------+||
+|||  Description                       |                                                    |||
+|||  ExportName                        |  RestApiID                                         |||
+|||  OutputKey                         |  RestApiResourceId                                 |||
+|||  OutputValue                       |  oxosx0ft3n                                        |||
+||+------------------------------------+----------------------------------------------------+||
 ```
 
-This has the information we need for querying the endpoint in Postman, particularly the `restApiId`.
+The RestApiId is the `OutputValue`
 
-4. Test the API with the following endpoint:
+5. Test the integration between ApiGateway and the SpringBoot container running locally
+The endpoint to hit on Postman comes in the form:
 ```
 http://localhost:4566/restapis/<REST_API_ID>/v0/_user_request_/mock
 ```
