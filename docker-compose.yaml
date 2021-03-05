@@ -1,0 +1,14 @@
+version: '3.2'
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack_demo
+    ports:
+      - '4566:4566'
+    environment:
+      - SERVICES=apigateway,cloudformation
+      - DEBUG=1
+  spring-helloworld:
+    image: scgrk/shw
+    ports:
+      - '8080:8080'
